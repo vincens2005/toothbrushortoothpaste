@@ -1,7 +1,7 @@
-<div>Teachable Machine Image Model</div>
-<button type="button" onclick="init()">Start</button>
-<div id="webcam-container"></div>
-<div id="label-container"></div>
+
+<button type="button" onclick="init()">press this button...</button>
+<div id="webcam-container" style="width: 90%"></div>
+<div id="label-container" ></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 <script type="text/javascript">
@@ -9,12 +9,13 @@
     // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
 
     // the link to your model provided by Teachable Machine export panel
-    const URL = "./my_model/";
+    const URL = "https://teachablemachine.withgoogle.com/models/weBN4vSl/";
 
     let model, webcam, labelContainer, maxPredictions;
 
     // Load the image model and setup the webcam
     async function init() {
+    	document.getElementById("label-container").innerHTML="wait for it...";
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
@@ -27,12 +28,13 @@
 
         // Convenience function to setup a webcam
         const flip = true; // whether to flip the webcam
-        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+        webcam = new tmImage.Webcam(1920, 1080, flip); // width, height, flip
         await webcam.setup(); // request access to the webcam
         await webcam.play();
         window.requestAnimationFrame(loop);
 
         // append elements to the DOM
+        webcam.canvas.style="width: 100%";
         document.getElementById("webcam-container").appendChild(webcam.canvas);
         labelContainer = document.getElementById("label-container");
         for (let i = 0; i < maxPredictions; i++) { // and class labels
@@ -51,9 +53,10 @@
         // predict can take in an image, video or canvas html element
         const prediction = await model.predict(webcam.canvas);
         for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
+        	document.getElementById("label-container").innerHTML="<br>now hold up some toothpaste";
+            if(prediction[i].probability.toFixed(2) >= 0.7 && prediction[i].className != "neither-one"){
+            	alert(prediction[i].className +" detected!");
+            }
         }
     }
 </script>
